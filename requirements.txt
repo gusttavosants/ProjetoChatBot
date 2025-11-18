@@ -1,0 +1,16 @@
+# FastAPI e Uvicorn
+fastapi
+uvicorn[standard]
+
+# Bibliotecas de RAG (LangChain ou LlamaIndex)
+langchain
+langchain-community
+chromadb
+sentence-transformers # Para gerar embeddings
+pydantic              # Para tipagem no FastAPI
+
+# SQL e Testes
+sqlalchemy
+pytest
+python-dotenv  
+pytest-asyncio       # Para gerenciar variáveis de ambiente
