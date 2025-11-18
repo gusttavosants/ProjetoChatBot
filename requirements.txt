@@ -1,16 +1,20 @@
-# FastAPI e Uvicorn
+# Servidor e Utilitários
 fastapi
 uvicorn[standard]
+python-dotenv
+pydantic
 
-# Bibliotecas de RAG (LangChain ou LlamaIndex)
+# LLM
+google-genai
+
+# RAG e VectorDB
 langchain
+langchain-core
 langchain-community
 chromadb
-sentence-transformers # Para gerar embeddings
-pydantic              # Para tipagem no FastAPI
+sentence-transformers
 
-# SQL e Testes
-sqlalchemy
+# Testes
 pytest
-python-dotenv  
-pytest-asyncio       # Para gerenciar variáveis de ambiente
+pytest-asyncio
+httpx   
