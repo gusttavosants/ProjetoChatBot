@@ -6,25 +6,23 @@ from typing import AsyncGenerator
 import os
 from dotenv import load_dotenv
 
-from backend.rag_pipeline import get_vector_store
+from .rag_pipeline import get_vector_store
 
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
-
-from backend.rag_pipeline import get_vector_store
 
 load_dotenv()
 
 app = FastAPI(title="Chatbot RAG SQL API")
 
 # CORS para Vite/CRA
-origins = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:5173"]
+origins = ["http://localhost:5173", "http://localhost:5174", "http://localhost:3000", "http://127.0.0.1:5173", "http://127.0.0.1:5174"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_credentials=False,
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -34,7 +32,7 @@ vector_store = get_vector_store()
 
 # Inicializa o LLM Gemini
 try:
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash", temperature=0)
+    llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro", temperature=0)
     print("[RAG] LLM inicializado com sucesso!")
 except Exception as e:
     print(f"[RAG] ERRO ao inicializar LLM: {e}")
@@ -68,17 +66,20 @@ def retrieval_step(query: str):
     return context
 
 # Pipeline RAG
-rag_chain = (
-    {"context": lambda x: retrieval_step(x["query"]), "query": lambda x: x["query"]}
-    | prompt
-    | llm.with_config({"tags": ["generation"]})
-    | StrOutputParser()
-)
+if llm:
+    rag_chain = (
+        {"context": lambda x: retrieval_step(x["query"]), "query": lambda x: x["query"]}
+        | prompt
+        | llm.with_config({"tags": ["generation"]})
+        | StrOutputParser()
+    )
+else:
+    rag_chain = None
 
 # Endpoint de streaming
 @app.post("/chat")
 async def chat_endpoint(query_data: QueryModel):
-    if not llm:
+    if not llm or not rag_chain:
         return StreamingResponse(
             iter(["Erro: LLM não foi inicializado. Verifique GEMINI_API_KEY."]),
             media_type="text/plain"
