@@ -5,7 +5,7 @@ python-dotenv
 pydantic
 
 # LLM
-google-genai
+langchain-google-genai
 
 # RAG e VectorDB
 langchain

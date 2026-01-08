@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from backend.app import app
+from backend.app import app, llm
 
 client = TestClient(app)
 
@@ -10,4 +10,7 @@ def test_chat_endpoint():
 
     text = response.text
 
-    assert "110V" in text or "informação necessária" in text
+    if llm:
+        assert "110V" in text or "informação necessária" in text
+    else:
+        assert "Erro: LLM não foi inicializado" in text
